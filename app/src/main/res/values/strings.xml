@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">Duka</string>
+    <string name="login">Login</string>
+    <string name="signin">Sign Up</string>
+    <string name="discount">20% Discount</string>
+    <string name="newarrival">New Arrival Product</string>
+    <string name="publishmore">Publish up your selfies to make yourself more beautiful on the app</string>
+    <string name="discount1">Take Advantage</string>
+    <string name="newarrivals">Of The Offer Shopping</string>
+    <string name="discount2">All Types of Offers</string>
+    <string name="newarrival3">Within Your Reach</string>
+    <string name="welcome">Welcome!</string>
+    <string name="pleaselogin">Please login or sign up to coninue to our app</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="or">or</string>
+    <string name="continuewithfacebook">Continue with Facebook</string>
+    <string name="continuewithgoogle">Continue with Google</string>
+    <string name="continuewithapple">Continue with Apple</string>
+    <string name="confirm">Confirm Password</string>
+    <string name="username">User Name</string>
+    <string name="consent">By creating an account you have to agree with our terms and conditions</string>
+    <string name="title_activity_home">HomeActivity</string>
+</resources>
