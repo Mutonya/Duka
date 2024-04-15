@@ -133,20 +133,27 @@ fun RoundedButton(
                     onButtonClicked:() ->Unit,
                     contentColor:Color,
                     backgroundcolor:Color,modifier: Modifier,pagerState: PagerState){
+    
+    AnimatedVisibility(visible =  pagerState.currentPage ==2) {
+        OutlinedButton(
+            onClick = {
+                onButtonClicked.invoke()
+                      },
+            modifier= Modifier.size(50.dp),
+            shape = CircleShape,
+            border= BorderStroke(5.dp, Color.Black),
+            contentPadding = PaddingValues(0.dp),
+            colors = ButtonDefaults.outlinedButtonColors(contentColor =  contentColor,containerColor = backgroundcolor)
+        ) {
 
-    OutlinedButton(onClick = { onButtonClicked},
-        modifier= Modifier.size(50.dp),
-        shape = CircleShape,
-        border= BorderStroke(5.dp, Color.Black),
-        contentPadding = PaddingValues(0.dp),
-        colors = ButtonDefaults.outlinedButtonColors(contentColor =  contentColor,containerColor = backgroundcolor)
-    ) {
-        AnimatedVisibility(visible = pagerState.currentPage ==2) {
             Icon(painterResource(id = R.drawable.baseline_keyboard_arrow_right_24) ,contentDescription = "content description", tint=Color.White)
 
+
+            // Adding an Icon "Add" inside the Button
         }
-        // Adding an Icon "Add" inside the Button
     }
+
+
 
 }
 

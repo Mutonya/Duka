@@ -24,7 +24,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.maestro.duka.R
 import com.maestro.duka.ui.core.AuthButtonComponent
-import com.maestro.duka.ui.navigation.AuthScreens
+import com.maestro.duka.navigation.AuthScreens
 import com.maestro.duka.ui.theme.DukaTheme
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")

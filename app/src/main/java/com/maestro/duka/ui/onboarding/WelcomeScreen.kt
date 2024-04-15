@@ -1,6 +1,5 @@
 package com.maestro.duka.ui.onboarding
 
-import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -10,7 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -27,15 +26,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.maestro.duka.ui.auth.AuthScreen
 import com.maestro.duka.ui.core.RoundedButton
-import com.maestro.duka.ui.navigation.AuthScreens
+import com.maestro.duka.navigation.AuthScreens
 import com.maestro.duka.ui.theme.DukaTheme
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun WelcomeScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    event: ((OnBoardingEvent) -> Unit)?
 ){
 
     val pages = listOf(
@@ -66,7 +65,8 @@ fun WelcomeScreen(
             Modifier
                 .wrapContentHeight()
                 .fillMaxWidth()
-                .padding(bottom = 8.dp, end = 8.dp),
+                .padding(bottom = 8.dp, end = 8.dp)
+                .navigationBarsPadding(),
             horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -88,7 +88,7 @@ fun WelcomeScreen(
 
 
             RoundedButton(onButtonClicked = {
-
+                event?.invoke(OnBoardingEvent.SaveAppEntry)
                 navController.navigate(AuthScreens.AuthScreen.route)
             },
                 contentColor = Color.White,
@@ -105,6 +105,6 @@ fun WelcomeScreen(
 @Composable
 fun DefaultPreview() {
     DukaTheme {
-        WelcomeScreen(rememberNavController())
+        WelcomeScreen(rememberNavController(),null)
     }
 }

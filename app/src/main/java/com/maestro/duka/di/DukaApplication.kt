@@ -2,6 +2,9 @@ package com.maestro.duka.di
 
 import android.app.Application
 import android.content.Context
+import dagger.hilt.android.HiltAndroidApp
+
+@HiltAndroidApp
 
 class DukaApplication :Application() {
 
