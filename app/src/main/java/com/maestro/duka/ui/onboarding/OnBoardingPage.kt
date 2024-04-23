@@ -29,4 +29,7 @@ sealed class OnBoardingPage (
         title2 = R.string.newarrival3,
         description =R.string.publishmore
     )
+
+
+
 }

@@ -5,22 +5,21 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.core.view.WindowCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.compose.rememberNavController
 import com.maestro.duka.domain.usecases.AuthUseCases.LocalUserManagerUseCases
-import com.maestro.duka.ui.auth.AuthScreen
-import com.maestro.duka.ui.auth.LoginScreen
-import com.maestro.duka.ui.auth.SignUpScreen
 import com.maestro.duka.navigation.AuthScreens
 import com.maestro.duka.navigation.AuthenticationNavigation
-import com.maestro.duka.ui.onboarding.WelcomeScreen
+import com.maestro.duka.ui.auth.LoginScreen
+import com.maestro.duka.ui.auth.vm.AuthViewModel
 import com.maestro.duka.ui.theme.DukaTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -33,6 +32,7 @@ class MainActivity : ComponentActivity() {
     lateinit var appEntryUseCase:LocalUserManagerUseCases
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        WindowCompat.setDecorFitsSystemWindows(window,false)
 
         installSplashScreen()
 
@@ -48,7 +48,7 @@ class MainActivity : ComponentActivity() {
 
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    color = Color.White
                 ) {
 
                     val screen = AuthScreens.WelcomeScreen.route

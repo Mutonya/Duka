@@ -3,34 +3,40 @@ package com.maestro.duka.ui.auth
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Snackbar
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.maestro.duka.R
@@ -38,9 +44,13 @@ import com.maestro.duka.data.remote.dto.AuthResponse
 import com.maestro.duka.di.DukaApplication
 import com.maestro.duka.ui.auth.vm.AuthViewModel
 import com.maestro.duka.ui.core.AuthButtonComponent
+import com.maestro.duka.ui.core.ButtonWithLeadingIcon
+import com.maestro.duka.ui.core.DividerTextComponent
 import com.maestro.duka.ui.core.EmailComponent
 import com.maestro.duka.ui.core.PasswordComponent
 import com.maestro.duka.ui.home.HomeActivity
+import com.maestro.duka.ui.theme.Black
+import com.maestro.duka.ui.theme.fonts
 import com.maestro.duka.utils.Resource
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -50,123 +60,56 @@ fun LoginScreen(
 ){
 
     val loginState by authViewModel!!.loginState.collectAsState()
-    subscribeToLoginEvents(loginState)
+    SubscribeToLoginEvents(loginState)
 
-    Scaffold (Modifier.background(color = Color.White)){
-        Column (
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .padding(start = 16.dp, end = 16.dp, bottom = 40.dp, top = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top,
+    Surface {
+        Column(modifier = Modifier.fillMaxSize()) {
 
-        ){
-            Image(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.25f),
-                painter = painterResource(id = R.drawable.logo),
-                contentScale = ContentScale.FillBounds,
-                contentDescription = "Logo"
-            )
+            TopAPPScreen()
 
+            Spacer(modifier = Modifier.height(36.dp))
 
+            Column (modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 32.dp)){
 
-            Text(
-                modifier = Modifier
-                    .fillMaxWidth()
+                LoginFieldSection(authViewModel)
 
-                    .padding(top = 8.dp),
-                text = stringResource(id = R.string.welcome),
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Start,
-                color = Color.Black
-            )
-            Text(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp, bottom = 8.dp),
-                text = stringResource(id = R.string.pleaselogin),
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Normal,
-                textAlign = TextAlign.Start,
-                color = Color.Gray
-            )
-            Spacer(modifier = Modifier.height(16.dp))
+                DividerTextComponent()
 
-          EmailComponent(label = stringResource(id = R.string.email),
-              onTextSelected = {
-               authViewModel!!.onEvent(LoginUiEvents.EmailChanged(it))
+                SocialMediaSection()
 
-          }, modifier = Modifier.padding(8.dp))
-
-            PasswordComponent(label = stringResource(id = R.string.password),
-                onTextSelected = {
-                  authViewModel!!.onEvent(LoginUiEvents.EmailChanged(it))
+                Box(modifier = Modifier
+                    .fillMaxHeight(0.8f)
+                    .fillMaxWidth(), contentAlignment = Alignment.BottomCenter){
+                    Text(
+                        buildAnnotatedString {
+                            withStyle(style = SpanStyle(fontFamily = fonts,color = Color.Gray)) {
+                                append("Don't have an account? ")
+                            }
 
 
-            }, modifier = Modifier.padding(8.dp))
+                            withStyle(style = SpanStyle(fontFamily = fonts, fontWeight = FontWeight.Bold, color = Color.Black)) {
+                                append("Sign up")
+                            }
 
-            Spacer(modifier = Modifier.height(32.dp))
-
-            AuthButtonComponent(
-                value = stringResource(id = R.string.login),
-                onButtonClicked = {
-
-
-                  authViewModel!!.onEvent(LoginUiEvents.LoginButtonClicked)
-
-                                  },
-                contentColor = Color.White,
-                backgroundcolor = Color.Black,
-                modifier = Modifier.padding(bottom = 8.dp, top = 8.dp)
-            )
-            Text(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp, bottom = 8.dp),
-                text = stringResource(id = R.string.or),
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Normal,
-                textAlign = TextAlign.Center,
-                color = Color.Black
-            )
+                        })
+                }
 
 
-            Spacer(modifier = Modifier.height(8.dp))
-
-            AuthButtonComponent(
-                value = stringResource(id = R.string.continuewithgoogle),
-                onButtonClicked = {
-                    val context = DukaApplication.context // Use your application context
-                    val intent = Intent(context, HomeActivity::class.java)
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    context.startActivity(intent)
-                },
-                contentColor = Color.Black,
-                backgroundcolor = Color.White,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-
-
-
-
-
+            }
         }
+
     }
-
-
 
 }
 
 @Composable
-private fun subscribeToLoginEvents(loginState: Resource<AuthResponse>) {
+private fun SubscribeToLoginEvents(loginState: Resource<AuthResponse>) {
     when(loginState){
         is Resource.Error -> {
 
-            //show error
+            Log.e("Error", loginState.message)
         }
         is Resource.Loading -> {
             //show progressbar
@@ -190,11 +133,129 @@ private fun subscribeToLoginEvents(loginState: Resource<AuthResponse>) {
     }
 }
 
+@Composable
+private fun SocialMediaSection() {
+    Row(modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center) {
+        ButtonWithLeadingIcon(
+            value = stringResource(id = R.string.continuewithgoogle),
+            onButtonClicked = {
+
+            },
+            modifier = Modifier.weight(1f),
+            icon = R.drawable.google
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        ButtonWithLeadingIcon(
+            value = stringResource(id = R.string.continuewithfacebook),
+            onButtonClicked = {
+
+            },
+            modifier = Modifier.weight(1f),
+            icon = R.drawable.facebook
+        )
+
+
+
+    }
+}
 
 @Composable
-@Preview(showBackground = true)
-fun FirstOnBoardingScreenPreview() {
-    Column(modifier = Modifier.fillMaxSize()) {
-        LoginScreen(null)
+private fun LoginFieldSection(authViewModel: AuthViewModel?) {
+    EmailComponent(label = stringResource(id = R.string.email),
+        onTextSelected = {
+            authViewModel!!.onEvent(LoginUiEvents.EmailChanged(it))
+
+        }, modifier = Modifier
+    )
+
+    PasswordComponent(label = stringResource(id = R.string.password),
+        onTextSelected = {
+            authViewModel!!.onEvent(LoginUiEvents.EmailChanged(it))
+
+
+        }, modifier = Modifier
+    )
+
+    Spacer(modifier = Modifier.height(32.dp))
+
+    AuthButtonComponent(
+        value = stringResource(id = R.string.login),
+        onButtonClicked = {
+
+
+            authViewModel!!.onEvent(LoginUiEvents.LoginButtonClicked)
+
+        },
+        contentColor = Color.White,
+        backgroundcolor = Color.Black,
+        modifier = Modifier.padding(bottom = 8.dp, top = 8.dp),
+
+        )
+}
+
+@Composable
+private fun TopAPPScreen() {
+    val uicolor = if (isSystemInDarkTheme()) Color.White else Black
+    if (isSystemInDarkTheme()) R.drawable.logodark else R.drawable.logolight
+
+    Box(contentAlignment = Alignment.TopCenter) {
+        Image(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.4f),
+            painter = painterResource(id = R.drawable.shape),
+            contentDescription = null,
+            contentScale = ContentScale.FillBounds
+        )
+
+
+        Row(
+            modifier = Modifier.padding(top = 60.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            Icon(
+                modifier = Modifier
+                    .size(60.dp)
+                    .clip(CircleShape),
+                painter = painterResource(id = R.drawable.logolight),
+                contentDescription = null,
+                tint= Color.Unspecified
+            )
+            Spacer(modifier = Modifier.width(15.dp))
+            Column {
+                Text(
+                    text = stringResource(id = R.string.duka),
+                    fontFamily = fonts,
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = uicolor
+                )
+                Text(
+                    text = stringResource(id = R.string.onestop),
+                    fontFamily = fonts,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = uicolor
+                )
+
+            }
+
+        }
+
+        Text(
+            modifier = Modifier
+                .padding(bottom = 16.dp)
+                .align(Alignment.BottomCenter),
+            text = stringResource(id = R.string.login),
+            fontFamily = fonts,
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold,
+            color = uicolor
+        )
+
+
     }
 }

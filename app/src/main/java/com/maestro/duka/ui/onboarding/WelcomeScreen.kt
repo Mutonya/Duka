@@ -6,14 +6,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
@@ -26,8 +25,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.maestro.duka.R
 import com.maestro.duka.ui.core.RoundedButton
 import com.maestro.duka.navigation.AuthScreens
+import com.maestro.duka.ui.core.PagerIndicator
 import com.maestro.duka.ui.theme.DukaTheme
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -37,67 +38,57 @@ fun WelcomeScreen(
     event: ((OnBoardingEvent) -> Unit)?
 ){
 
-    val pages = listOf(
-        OnBoardingPage.FirstPage,
-        OnBoardingPage.SecondPage,
-        OnBoardingPage.ThirdPage
+
+    val page = listOf(
+        Page.FirstPage,
+        Page.SecondPage,
+        Page.ThirdPage,
+        Page.FourthPage
     )
 
     val pagerState = rememberPagerState(
         initialPage = 0,
         initialPageOffsetFraction = 0f
     ) {
-        pages.size
+        page.size
     }
     Column (modifier = Modifier
         .fillMaxSize()
-        .background(color = Color.White)
+        .background(color = Color.White),
+        horizontalAlignment = Alignment.CenterHorizontally
     ){
         HorizontalPager(
             modifier = Modifier.weight(1f),
             verticalAlignment = Alignment.Top,
             state = pagerState
         ) {
-            PagerScreen(onBoardingPage = pages[it])
-        }
+            when(page[it]){
+                Page.FirstPage -> WelcometoApp()
+                Page.FourthPage -> PagerScreens(
+                    image = R.drawable.buy,
+                    title = R.string.discount,
 
-        Row(
-            Modifier
-                .wrapContentHeight()
-                .fillMaxWidth()
-                .padding(bottom = 8.dp, end = 8.dp)
-                .navigationBarsPadding(),
-            horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            repeat(pagerState.pageCount) { iteration ->
-                val color =
-                    if (pagerState.currentPage == iteration) Color.Black else Color.Gray
-                Box(
-                    modifier = Modifier
-                        .padding(2.dp)
-                        .clip(CircleShape)
-                        .background(color)
-                        .weight(1f)
-                        .size(8.dp)
                 )
+                Page.SecondPage -> PagerScreens(image = R.drawable.buys,
+                    title = R.string.discount1,
+                  )
+                Page.ThirdPage -> PagerScreens(    image = R.drawable.buyss,
+                    title = R.string.discount2,
+                   )
             }
 
-            Spacer(modifier = Modifier.width(8.dp))
-
-
-
-            RoundedButton(onButtonClicked = {
-                event?.invoke(OnBoardingEvent.SaveAppEntry)
-                navController.navigate(AuthScreens.AuthScreen.route)
-            },
-                contentColor = Color.White,
-                backgroundcolor =Color.Black,
-                modifier = Modifier
-                    .padding(bottom = 10.dp, end = 8.dp),
-                pagerState = pagerState
-                    )
         }
+
+        PagerIndicator(pageCount = pagerState.pageCount, currentPage = pagerState.currentPage)
+        RoundedButton(onButtonClicked = {
+            event?.invoke(OnBoardingEvent.SaveAppEntry)
+            navController.navigate(AuthScreens.LoginScreen.route)
+        },
+            contentColor = Color.White,
+            backgroundcolor =Color.Black,
+            modifier = Modifier.navigationBarsPadding(),
+            pagerState = pagerState
+        )
     }
 
 }
