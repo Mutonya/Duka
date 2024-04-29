@@ -6,7 +6,6 @@ import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -67,6 +66,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.maestro.duka.R
+import com.maestro.duka.data.local.CartItems
 import com.maestro.duka.data.remote.dto.ProductsResponseItem
 import com.maestro.duka.data.remote.dto.Rating
 import com.maestro.duka.di.DukaApplication.Companion.context
@@ -97,7 +97,7 @@ fun DetailsScreen(
     var buttonScale by remember { mutableFloatStateOf(0f) }
     var iconScale by remember { mutableFloatStateOf(0f) }
     var sneakerScale by remember { mutableFloatStateOf(0.6f) }
-    var sneakerRotate by remember { mutableFloatStateOf(-60f) }
+    var sneakerRotate by remember { mutableFloatStateOf(0f) }
     var selectedSize by remember { mutableStateOf("Large") }
 
     val animatedXOffset = animateDpAsState(
@@ -141,7 +141,7 @@ fun DetailsScreen(
         xOffset = 140.dp
         yOffset = (-130).dp
         sneakerScale = 1f
-        sneakerRotate = -25f
+        sneakerRotate = 0f
         delay(400)
         iconScale = 1f
         delay(100)
@@ -153,15 +153,16 @@ fun DetailsScreen(
     Box(modifier = Modifier
         .fillMaxSize()
         .background(Color.White)){
-        Column (modifier = Modifier.verticalScroll(rememberScrollState())){
-            TopNavigationBar(productItem,event,navigateUp)
 
+        Column (modifier = Modifier
+            .verticalScroll(rememberScrollState())){
+            TopNavigationBar(productItem,event,navigateUp,selectedSize)
             AsyncImage(modifier = Modifier
                 .scale(animatedSneakerScale.value)
                 .rotate(animatedSneakerRotate.value)
                 .padding(end = 48.dp)
                 .padding(top = 30.dp)
-                .size(320.dp),
+                .size(300.dp),
                 model = ImageRequest.Builder(context).data(productItem.image).build(),
                 contentDescription =null )
 
@@ -171,7 +172,8 @@ fun DetailsScreen(
                 .padding(top = 48.dp),
                 horizontalArrangement = Arrangement.SpaceBetween){
 
-                Column {
+                Column (modifier = Modifier.padding(end = 25.dp)
+                    .fillMaxWidth(0.7f)) {
                     Text(
                         text = productItem.category,
                         color = LightText,
@@ -207,7 +209,7 @@ fun DetailsScreen(
                     text = productItem.price.toString(),
                     color = Accent,
                     fontFamily = fonts,
-                    fontSize = 18.sp,
+                    fontSize = 30.sp,
                     style = TextStyle(
                         platformStyle = PlatformTextStyle(
                             includeFontPadding = false
@@ -216,21 +218,7 @@ fun DetailsScreen(
                 )
 
             }
-            Text(
-                modifier = Modifier
-                    .padding(horizontal = 22.dp)
-                    .padding(top = 8.dp),
-                text = "Size",
-                color = MediumText,
-                fontSize = 10.sp,
-                fontFamily = fonts,
-                fontWeight = FontWeight.Bold,
-                style = TextStyle(
-                    platformStyle = PlatformTextStyle(
-                        includeFontPadding = false
-                    )
-                )
-            )
+
 
 
             SizesView(selectedSize)
@@ -256,7 +244,7 @@ fun DetailsScreen(
                 .fillMaxHeight(0.8f)
                 .fillMaxWidth(), contentAlignment = Alignment.BottomCenter) {
 
-                BottomPart(animatedIconScale, animatedButtonScale)
+                BottomPart(animatedIconScale, animatedButtonScale,productItem,event,selectedSize)
             }
 
         }
@@ -264,59 +252,6 @@ fun DetailsScreen(
 
 }
 
-@SuppressLint("QueryPermissionsNeeded")
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TopBar(
-
-    productItem: ProductsResponseItem,
-    event: (DetailsEvent) -> Unit,
-    navigateUp: () -> Unit
-) {
-    val context = LocalContext.current
-    TopAppBar(modifier = Modifier.fillMaxWidth(),
-        colors = TopAppBarDefaults.mediumTopAppBarColors(
-            containerColor = Color.Transparent,
-            actionIconContentColor = Color.Black,
-            navigationIconContentColor = Color.Black
-        ),
-        title = {  },
-        navigationIcon = {
-            IconButton(onClick = {
-                navigateUp.invoke()
-            }) {
-                Icon(painter = painterResource(id = R.drawable.arrow),
-                    contentDescription =null )
-
-            }
-        },
-        actions = {
-            IconButton(onClick = {
-                event(DetailsEvent.BookMarkClicked(productItem))
-            }) {
-                Icon(
-                    painter = painterResource(id = R.drawable.bookmark),
-                    contentDescription = null
-                )
-            }
-            IconButton(onClick = {
-                Intent(Intent.ACTION_SEND).also {
-                    it.putExtra(Intent.EXTRA_TEXT, productItem.image)
-                    it.type = "text/plain"
-                    if (it.resolveActivity(context.packageManager) != null) {
-                        context.startActivity(it)
-                    }
-                }
-
-            }) {
-                Icon(
-                    painterResource(id = R.drawable.share) ,
-                    contentDescription = null
-                )
-            }
-        }
-        )
-}
 @Preview(showBackground = true)
 @Composable
 private fun DetailsPreview(){
@@ -346,7 +281,10 @@ DetailsScreen(productItem = ProductsResponseItem(
 @Composable
 private fun BottomPart(
     animatedIconScale: State<Float>,
-    animatedButtonScale: State<Float>
+    animatedButtonScale: State<Float>,
+    productItem: ProductsResponseItem,
+    event: (DetailsEvent) -> Unit,
+    selectedSize: String
 ) {
     Row(
         modifier = Modifier
@@ -357,7 +295,9 @@ private fun BottomPart(
         IconButton(
             modifier = Modifier
                 .scale(animatedIconScale.value),
-            onClick = { }
+            onClick = {
+
+            }
         ) {
             val isFavorite = false
             Icon(
@@ -377,7 +317,20 @@ private fun BottomPart(
             colors = ButtonDefaults.buttonColors(
                 containerColor = Accent
             ),
-            onClick = {}
+            onClick = {
+                event(DetailsEvent.AddToCart(cartItems = CartItems(
+                    cartId = productItem.id,
+                    selectedColor = Blueback.hashCode(),
+                    selectedSize = selectedSize,
+                    quantity = null,
+                    category = productItem.category,
+                    description = productItem.description,
+                image = productItem.image,
+               price = productItem.price,
+                 rating = productItem.rating,
+                title= productItem.title
+                )))
+            }
         ) {
             Icon(
                 imageVector = Icons.Rounded.ShoppingCart,
@@ -393,6 +346,21 @@ private fun BottomPart(
 @Composable
 private fun SizesView(selectedSize: String) {
     var selectedSize1 = selectedSize
+    Text(
+        modifier = Modifier
+            .padding(horizontal = 22.dp)
+            .padding(top = 8.dp),
+        text = "Size",
+        color = MediumText,
+        fontSize = 10.sp,
+        fontFamily = fonts,
+        fontWeight = FontWeight.Bold,
+        style = TextStyle(
+            platformStyle = PlatformTextStyle(
+                includeFontPadding = false
+            )
+        )
+    )
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -457,9 +425,12 @@ private fun StarView(productItem: ProductsResponseItem) {
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-private fun TopNavigationBar( productItem: ProductsResponseItem,
-                              event: (DetailsEvent) ->Unit,
-                              navigateUp:() ->Unit) {
+private fun TopNavigationBar(
+    productItem: ProductsResponseItem,
+    event: (DetailsEvent) -> Unit,
+    navigateUp: () -> Unit,
+    selectedSize: String
+) {
     TopAppBar(modifier = Modifier.fillMaxWidth(),
         colors = TopAppBarDefaults.mediumTopAppBarColors(
             containerColor = Color.Transparent,
@@ -525,7 +496,7 @@ private fun TopNavigationBar( productItem: ProductsResponseItem,
                     .background(color = Color.White, shape = RoundedCornerShape(12.dp))
                     .size(36.dp),
                 onClick = {
-
+                    //share
                 }
             ) {
                 Icon(

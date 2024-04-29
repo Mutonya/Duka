@@ -1,7 +1,7 @@
 package com.maestro.duka.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -11,29 +11,32 @@ import com.maestro.duka.data.remote.dto.ProductsResponseItem
 import com.maestro.duka.ui.home.BottomNavigation.BottomNavItems
 import com.maestro.duka.ui.home.details.DetailsScreen
 import com.maestro.duka.ui.home.details.DetailsViewModel
-import com.maestro.duka.ui.home.tabs.BookMarkScreen
-import com.maestro.duka.ui.home.tabs.CartScreen
-import com.maestro.duka.ui.home.tabs.HistoryScreen
-import com.maestro.duka.ui.home.tabs.ScreenHome
+import com.maestro.duka.ui.home.tabs.bookmark.BookMarkScreen
+import com.maestro.duka.ui.home.tabs.cart.CartScreen
+import com.maestro.duka.ui.home.tabs.history.HistoryScreen
+import com.maestro.duka.ui.home.tabs.home.ScreenHome
 import com.maestro.duka.ui.home.vm.BookMarkViewModel
+import com.maestro.duka.ui.home.vm.CartViewModel
 
 import com.maestro.duka.ui.home.vm.HomeViewModel
 
 @Composable
 fun BottomNavGraph (
-    navHostController: NavHostController
+    navHostController: NavHostController,
+    modifier: Modifier
 ){
     NavHost(navController = navHostController, startDestination = BottomNavItems.Home.route ){
         composable(route = BottomNavItems.Home.route){
             val homeViewModel:HomeViewModel = hiltViewModel()
 
-            ScreenHome(navigateToSearch = { navigateToTab(navHostController,BottomNavItems.Cart.route) }) {
+            ScreenHome(homeViewModel = homeViewModel,navigateToSearch = { navigateToTab(navHostController,BottomNavItems.Cart.route) }) {
                 navigateToDetails(navHostController,it)
                 
             }
         }
         composable(route = BottomNavItems.Cart.route){
-            CartScreen()
+            val cartViewModel:CartViewModel = hiltViewModel()
+            CartScreen(state = cartViewModel.state.value)
         }
         composable(route = BottomNavItems.BookMark.route){
             val bookMarkViewMode:BookMarkViewModel = hiltViewModel()

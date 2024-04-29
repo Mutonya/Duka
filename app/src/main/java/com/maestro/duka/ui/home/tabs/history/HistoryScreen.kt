@@ -1,4 +1,4 @@
-package com.maestro.duka.ui.home.tabs
+package com.maestro.duka.ui.home.tabs.history
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box

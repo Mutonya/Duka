@@ -2,8 +2,10 @@ package com.maestro.duka.ui.core
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -42,6 +44,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -57,7 +60,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.TileMode
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.PlatformTextStyle
@@ -69,10 +78,13 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.maestro.duka.R
 import com.maestro.duka.ui.theme.Accent
+import com.maestro.duka.ui.theme.BlueGray
+import com.maestro.duka.ui.theme.Blueback
 import com.maestro.duka.ui.theme.Border
 import com.maestro.duka.ui.theme.DukaTheme
 import com.maestro.duka.ui.theme.RegularText
@@ -478,5 +490,129 @@ fun ProductSizeCard(
                 includeFontPadding = false
             )
         )
+    )
+}
+
+@Composable
+@Preview
+fun PreviewCartButtonCircle(){
+    DukaTheme {
+        CartButtonCircle(imageVector =R.drawable.minus , onClick = {  }, contentDescription =null )
+    }
+}
+
+@Composable
+fun CartButtonCircle(imageVector: Int,
+                     onClick: () -> Unit,
+                     contentDescription: String?,
+                     modifier: Modifier = Modifier,){
+
+
+    val interactionSource = remember { MutableInteractionSource() }
+    val pressed by interactionSource.collectIsPressedAsState()
+
+    // This should use a layer + srcIn but needs investigation
+    val border = Modifier.fadeInDiagonalGradientBorder(
+        showBorder = true,
+        colors = listOf(
+            Blueback,
+            BlueGray
+        ),
+        shape = CircleShape
+    )
+    val background = if (pressed) {
+        Modifier.offsetGradientBackground( colors = listOf(
+            Blueback,
+            BlueGray
+        ), 200f, 0f)
+    } else {
+        Modifier.background(Color.White)
+    }
+    val modifierColor = if (pressed) {
+        Modifier.diagonalGradientTint(
+            colors = listOf(
+               Blueback,
+                BlueGray
+            )
+
+        )
+    } else {
+        Modifier.diagonalGradientTint(
+            colors = listOf(
+                Blueback,
+                BlueGray
+            )
+
+        )
+    }
+    Surface(
+        modifier = modifier
+            .size(20.dp)
+            .clickable(
+                onClick = onClick,
+                interactionSource = interactionSource,
+                indication = null
+            )
+            .clip(CircleShape),
+        color = Color.Transparent
+    ) {
+        Icon(
+            painter = painterResource(id = imageVector),
+            contentDescription = contentDescription,
+            tint = Color.White,
+            modifier = modifierColor
+        )
+    }
+}
+fun Modifier.fadeInDiagonalGradientBorder(
+    showBorder: Boolean,
+    colors: List<Color>,
+    borderSize: Dp = 2.dp,
+    shape: Shape
+) = composed {
+    val animatedColors = List(colors.size) { i ->
+        animateColorAsState(
+            if (showBorder) colors[i] else colors[i].copy(alpha = 0f),
+            label = "animated color"
+        ).value
+    }
+    diagonalGradientBorder(
+        colors = animatedColors,
+        borderSize = borderSize,
+        shape = shape
+    )
+}
+
+@SuppressLint("ModifierFactoryUnreferencedReceiver")
+fun Modifier.diagonalGradientBorder(
+    colors: List<Color>,
+    borderSize: Dp = 2.dp,
+    shape: Shape
+) = border(
+    width = borderSize,
+    brush = Brush.linearGradient(colors),
+    shape = shape
+)
+fun Modifier.offsetGradientBackground(
+    colors: List<Color>,
+    width: Float,
+    offset: Float = 0f
+) = background(
+    Brush.horizontalGradient(
+        colors = colors,
+        startX = -offset,
+        endX = width - offset,
+        tileMode = TileMode.Mirror
+    )
+)
+
+fun Modifier.diagonalGradientTint(
+    colors: List<Color>,
+
+) = drawWithContent {
+    drawContent()
+    drawRect(
+        brush = Brush.linearGradient(colors)
+
     )
 }

@@ -1,6 +1,7 @@
 package com.maestro.duka.domain.usecases.BookMark
 
 import android.util.Log
+import com.maestro.duka.data.local.CartItems
 import com.maestro.duka.data.remote.dto.ProductsResponseItem
 import com.maestro.duka.data.repository.BookMarkRepository
 import kotlinx.coroutines.flow.Flow
@@ -22,7 +23,23 @@ class BookMarkUseCase @Inject constructor(
        return bookMarkRepository.getAllProducts()
     }
 
-    override suspend fun getSingleArticle(id: Int): ProductsResponseItem {
+    override  fun getSingleArticle(id: Int): Flow<ProductsResponseItem>? {
         return bookMarkRepository.getSingleArticle(id)
+    }
+
+    override suspend fun addToCart(cartItems: CartItems) {
+        return bookMarkRepository.addToCart(cartItems)
+    }
+
+//    override suspend fun clearCart(id: CartItems) {
+//       return bookMarkRepository.clearCart(id)
+//    }
+
+    override fun getCartItems(): Flow<List<CartItems>> {
+        return bookMarkRepository.getCartItems()
+    }
+
+    override suspend fun getSingleCartItem(id: Int): CartItems {
+        return bookMarkRepository.getSingleCartItem(id)
     }
 }

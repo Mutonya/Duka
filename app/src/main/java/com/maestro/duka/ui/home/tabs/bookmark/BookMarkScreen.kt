@@ -1,4 +1,4 @@
-package com.maestro.duka.ui.home.tabs
+package com.maestro.duka.ui.home.tabs.bookmark
 
 import android.util.Log
 import androidx.compose.foundation.background

@@ -2,6 +2,7 @@ package com.maestro.duka.data.remote
 
 import com.maestro.duka.data.remote.dto.AuthResponse
 import com.maestro.duka.data.remote.dto.Login
+import com.maestro.duka.data.remote.dto.PaymentResponse
 import com.maestro.duka.data.remote.dto.ProductsResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -17,4 +18,6 @@ interface FakeStoreApi {
 
     suspend fun fetchproducts(
     ):ProductsResponse
+
+
 }

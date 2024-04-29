@@ -2,18 +2,22 @@ package com.maestro.duka.di
 
 import android.app.Application
 import androidx.room.Room
+import com.maestro.duka.data.local.CartDao
 import com.maestro.duka.data.local.DukaDatabase
 import com.maestro.duka.data.local.ProductsDao
 import com.maestro.duka.data.local.ProductsTypeConvertor
 import com.maestro.duka.data.manager.LocalUserManagerImpl
 import com.maestro.duka.data.remote.FakeStoreApi
+import com.maestro.duka.data.remote.StripeApi
 import com.maestro.duka.data.repository.AuthRepositoryImpl
 import com.maestro.duka.data.repository.BookMarkRepository
 import com.maestro.duka.data.repository.BookMarkRepositoryImpl
 import com.maestro.duka.data.repository.HomeRepositoryImpl
+import com.maestro.duka.data.repository.PaymentRepository
 import com.maestro.duka.domain.manager.LocalUserManager
 import com.maestro.duka.domain.repository.AuthRepository
 import com.maestro.duka.domain.repository.HomeRepository
+import com.maestro.duka.domain.repository.PaymentRepositoryImpl
 import com.maestro.duka.domain.usecases.AuthUseCases.AuthUseCase
 import com.maestro.duka.domain.usecases.AuthUseCases.AuthUseCaseImpl
 import com.maestro.duka.domain.usecases.AuthUseCases.LocalUserManagerUseCases
@@ -21,6 +25,8 @@ import com.maestro.duka.domain.usecases.BookMark.BookMarkUseCase
 import com.maestro.duka.domain.usecases.BookMark.BookMarkUseCaseImpl
 import com.maestro.duka.domain.usecases.HomeUseCases.HomeUseCaseImpl
 import com.maestro.duka.domain.usecases.HomeUseCases.HomeUseCases
+import com.maestro.duka.domain.usecases.Payments.PaymentUseCase
+import com.maestro.duka.domain.usecases.Payments.PaymentsUseCaseImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -32,6 +38,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import javax.inject.Named
 import javax.inject.Singleton
 
 
@@ -46,7 +53,7 @@ object DukaModule {
 
         val loggingInterceptor = HttpLoggingInterceptor{
         }.apply {
-            level = HttpLoggingInterceptor.Level.BASIC
+            level = HttpLoggingInterceptor.Level.HEADERS
         }
         return OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
@@ -64,6 +71,17 @@ object DukaModule {
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
+
+    @Provides
+    @Singleton
+    @Named("stripe")
+    fun provideRetrofit2(
+        okHttpClient: OkHttpClient,
+    ): Retrofit = Retrofit.Builder()
+        .baseUrl("https://aclkenya.dolmitisolutions.com/")
+        .client(okHttpClient)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
     @Provides
     @Singleton
     fun provideDispatcher(): CoroutineDispatcher {
@@ -73,6 +91,11 @@ object DukaModule {
     @Singleton
     fun provideApi(retrofit: Retrofit): FakeStoreApi {
         return retrofit.create(FakeStoreApi::class.java)
+    }
+    @Provides
+    @Singleton
+    fun provideStripeApi(@Named("stripe")retrofit: Retrofit): StripeApi {
+        return retrofit.create(StripeApi::class.java)
     }
 
     @Provides
@@ -107,6 +130,11 @@ object DukaModule {
         dukaDatabase: DukaDatabase
     ):ProductsDao = dukaDatabase.productsDao
 
+    @Provides
+    @Singleton
+    fun provideCartDao(
+        database: DukaDatabase
+    ):CartDao = database.cartDao
 
     @Module
     @InstallIn(SingletonComponent::class)
@@ -143,6 +171,13 @@ object DukaModule {
         @Binds
         @Singleton
         fun providebookmarkusecase(bookmarkUseCase:BookMarkUseCase):BookMarkUseCaseImpl
+
+        @Binds
+        @Singleton
+        fun provideStripeRepo(repo: PaymentRepository): PaymentRepositoryImpl
+        @Binds
+        @Singleton
+        fun provideStripeUseCase(useCase: PaymentUseCase): PaymentsUseCaseImpl
     }
 
 

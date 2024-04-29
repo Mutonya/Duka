@@ -5,13 +5,19 @@
       <entry key="FirstOnBoardingScreenPreview">
         <State />
       </entry>
-      <entry key="MainActivity">
-        <State />
-      </entry>
       <entry key="PreTopBar">
         <State />
       </entry>
+      <entry key="PreviewBottom">
+        <State />
+      </entry>
+      <entry key="PreviewProductsItem">
+        <State />
+      </entry>
       <entry key="app">
+        <State />
+      </entry>
+      <entry key="preiewCat">
         <State />
       </entry>
     </value>
