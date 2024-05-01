@@ -17,17 +17,12 @@ jobs:
           distribution: 'temurin' # See 'Supported distributions' for available options
           java-version: '17'
       - name: Build with Gradle
-        run: ./gradlew build
+        run: chmod +x ./gradlew build
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v4.3.3
         with:
-          # Name of the artifact to upload.
-          # Optional. Default is 'artifact'
-          name: Duka.apk
-
-          # A file, directory or wildcard pattern that describes what to upload
-          # Required.
-          path: app/build/outputs/apk/debug/app-debug.apk
+         name: Duka.apk
+         path: app/build/outputs/apk/debug/app-debug.apk
 
 
 
